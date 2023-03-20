@@ -16,6 +16,8 @@ services:
       timeout: 1s
       retries: 3
       start_period: 1s
+    ports:
+      - '5432:5432'
     restart: always
   backend:
     container_name: dionysus
