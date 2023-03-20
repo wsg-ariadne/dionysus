@@ -1,0 +1,13 @@
+[database]
+host=database
+port=5432
+name=dionysus
+user=postgres
+pass=postgres
+
+[dionysus]
+debug=no
+api_prefix=/api/v1
+enable_logger_middleware=no
+; Comma-separated allowed origins for CORS
+cors_origins=example1.com,example2.com

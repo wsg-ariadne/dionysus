@@ -1,0 +1,10 @@
+# Python virtualenvs
+.venv/
+.virtualenv/
+
+# Python bytecode
+**/__pycache__/
+**/*.py[cod]
+
+# Config files
+**/*.conf
