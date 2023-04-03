@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Blueprint, request
 from models import VALID_DESIGN_TYPES
 from models.report import Report
-from typing import Dict, List
+from typing import List
 from urllib.parse import urlparse
 
 
