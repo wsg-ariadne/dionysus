@@ -1,7 +1,7 @@
 from database import db
 from datetime import datetime
 from flask import Blueprint, request
-from models import VALID_DESIGN_TYPES
+from models import FRIENDLY_DESIGN_TYPES, VALID_DESIGN_TYPES
 from models.report import Report
 from typing import List
 from urllib.parse import urlparse
@@ -119,9 +119,34 @@ def get_report(report_id: str):
             'id': report.id,
             'domain': report.domain,
             'path': report.path,
-            'deceptive_design_type': report.deceptive_design_type,
+            'deceptive_design_type': FRIENDLY_DESIGN_TYPES[report.deceptive_design_type],
             'is_custom_type': report.is_custom_type,
             'num_reports': report.num_reports,
-            'last_report_timestamp': report.last_report_timestamp
+            'last_report_timestamp': report.last_report_timestamp.timestamp() * 1000
         }
+    }, 200
+
+
+@bp_report.route('/reports', methods=['GET'])
+def get_reports():
+    # Get reports
+    reports = Report.query.all()
+    if not reports:
+        return {
+            'success': False,
+            'error': 'No reports found'
+        }, 404
+    
+    # Return
+    return {
+        'success': True,
+        'reports': [{
+            'id': report.id,
+            'domain': report.domain,
+            'path': report.path,
+            'deceptive_design_type': FRIENDLY_DESIGN_TYPES[report.deceptive_design_type],
+            'is_custom_type': report.is_custom_type,
+            'num_reports': report.num_reports,
+            'last_report_timestamp': report.last_report_timestamp.timestamp() * 1000
+        } for report in reports]
     }, 200
