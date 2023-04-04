@@ -8,7 +8,7 @@ importlib-metadata==6.1.0
 itsdangerous==2.1.2
 Jinja2==3.1.2
 MarkupSafe==2.1.2
-psycopg2-binary==2.9.5
+psycopg2==2.9.6
 six==1.16.0
 SQLAlchemy==2.0.7
 typing_extensions==4.5.0
