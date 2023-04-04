@@ -100,4 +100,28 @@ def submit_report():
         'success': True,
         'reports': reports
     }, 200
+
+
+@bp_report.route('/report/<report_id>', methods=['GET'])
+def get_report(report_id: str):
+    # Get report
+    report = Report.query.filter_by(id=report_id).first()
+    if not report:
+        return {
+            'success': False,
+            'error': 'Report not found'
+        }, 404
     
+    # Return report
+    return {
+        'success': True,
+        'report': {
+            'id': report.id,
+            'domain': report.domain,
+            'path': report.path,
+            'deceptive_design_type': report.deceptive_design_type,
+            'is_custom_type': report.is_custom_type,
+            'num_reports': report.num_reports,
+            'last_report_timestamp': report.last_report_timestamp
+        }
+    }, 200
