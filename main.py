@@ -1,4 +1,5 @@
 from database import create_app, db
+from flask import url_for
 from flask_cors import CORS
 from middleware.logger import LoggingMiddleware
 from routes import install_routes
@@ -46,6 +47,23 @@ cors = CORS(app, resources={
 # Add routes
 app.config['API_URL_PREFIX'] = api_prefix
 install_routes(app)
+if debug:
+    def has_no_empty_params(rule):
+        defaults = rule.defaults if rule.defaults is not None else ()
+        arguments = rule.arguments if rule.arguments is not None else ()
+        return len(defaults) >= len(arguments)
+
+    @app.route("/site-map")
+    def site_map():
+        links = []
+        for rule in app.url_map.iter_rules():
+            # Filter out rules we can't navigate to in a browser
+            # and rules that require parameters
+            if "GET" in rule.methods and has_no_empty_params(rule):
+                url = url_for(rule.endpoint, **(rule.defaults or {}))
+                links.append((url, rule.endpoint))
+        # links is now a list of url, endpoint tuples
+        return str(links)
 
 
 # Start Flask app
