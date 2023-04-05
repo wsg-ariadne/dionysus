@@ -8,3 +8,4 @@
 
 # Config files
 **/*.conf
+docker-compose.yml
