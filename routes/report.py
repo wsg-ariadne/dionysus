@@ -102,8 +102,17 @@ def submit_report():
     }, 200
 
 
-@bp_report.route('/report/<report_id>', methods=['GET'])
-def get_report(report_id: str):
+@bp_report.route('/report/by-id', methods=['GET'])
+def get_report():
+    # Check request body
+    try:
+        report_id = request.json['report_id']
+    except KeyError:
+        return {
+            'success': False,
+            'error': 'Missing report ID'
+        }, 400
+    
     # Get report
     report = Report.query.filter_by(id=report_id).first()
     if not report:
