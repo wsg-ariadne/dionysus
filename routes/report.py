@@ -136,6 +136,47 @@ def get_report():
     }, 200
 
 
+@bp_report.route('/report/by-url', methods=['GET'])
+def get_report_by_url():
+    # Check request body
+    try:
+        page_url = request.json['page_url']
+    except KeyError:
+        return {
+            'success': False,
+            'error': 'Missing page URL'
+        }, 400
+    
+    # Check if page_url is valid
+    try:
+        parsed_url = urlparse(page_url)
+        if not parsed_url.scheme or not parsed_url.netloc:
+            raise ValueError
+    except ValueError:
+        return {
+            'success': False,
+            'error': 'Invalid URL'
+        }, 400
+    else:
+        # Extract domain and path from URL
+        domain = parsed_url.netloc
+        path = parsed_url.path
+    
+    # Get reports sorted by last_report_timestamp
+    specific_reports = Report.query.filter_by(domain=domain, path=path).order_by(Report.last_report_timestamp.desc())
+    general_reports = Report.query.filter_by(domain=domain).order_by(Report.last_report_timestamp.desc())
+    return {
+        'success': True,
+        'specific_reports': {
+            'count': specific_reports.count(),
+            'last_report_timestamp': specific_reports.first().last_report_timestamp.timestamp() * 1000 if specific_reports.first() else None,
+        },
+        'general_reports': {
+            'count': general_reports.count(),
+            'last_report_timestamp': general_reports.first().last_report_timestamp.timestamp() * 1000 if general_reports.first() else None,
+        }
+    }, 200
+
 @bp_report.route('/reports', methods=['GET'])
 def get_reports():
     # Get reports
