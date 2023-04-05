@@ -10,4 +10,4 @@ def install_routes(app: 'Flask'):
     url_prefix = app.config['API_URL_PREFIX']
     
     app.register_blueprint(bp_healthcheck, url_prefix=url_prefix)
-    app.register_blueprint(bp_report, url_prefix=url_prefix)
+    app.register_blueprint(bp_report, url_prefix=url_prefix + '/reports')

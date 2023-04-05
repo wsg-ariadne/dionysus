@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 bp_report = Blueprint('report', __name__)
 
 
-@bp_report.route('/report', methods=['POST'])
+@bp_report.route('/', methods=['POST'])
 def submit_report():
     # Check request body
     try:
@@ -102,7 +102,32 @@ def submit_report():
     }, 200
 
 
-@bp_report.route('/report/by-id', methods=['GET'])
+@bp_report.route('/', methods=['GET'])
+def get_reports():
+    # Get reports
+    reports = Report.query.all()
+    if not reports:
+        return {
+            'success': False,
+            'error': 'No reports found'
+        }, 404
+    
+    # Return
+    return {
+        'success': True,
+        'reports': [{
+            'id': report.id,
+            'domain': report.domain,
+            'path': report.path,
+            'deceptive_design_type': FRIENDLY_DESIGN_TYPES[report.deceptive_design_type],
+            'is_custom_type': report.is_custom_type,
+            'num_reports': report.num_reports,
+            'last_report_timestamp': report.last_report_timestamp.timestamp() * 1000
+        } for report in reports]
+    }, 200
+
+
+@bp_report.route('/by-id', methods=['GET'])
 def get_report():
     # Check request body
     try:
@@ -136,7 +161,7 @@ def get_report():
     }, 200
 
 
-@bp_report.route('/report/by-url', methods=['GET'])
+@bp_report.route('/by-url', methods=['GET'])
 def get_report_by_url():
     # Check request body
     try:
@@ -175,28 +200,4 @@ def get_report_by_url():
             'count': general_reports.count(),
             'last_report_timestamp': general_reports.first().last_report_timestamp.timestamp() * 1000 if general_reports.first() else None,
         }
-    }, 200
-
-@bp_report.route('/reports', methods=['GET'])
-def get_reports():
-    # Get reports
-    reports = Report.query.all()
-    if not reports:
-        return {
-            'success': False,
-            'error': 'No reports found'
-        }, 404
-    
-    # Return
-    return {
-        'success': True,
-        'reports': [{
-            'id': report.id,
-            'domain': report.domain,
-            'path': report.path,
-            'deceptive_design_type': FRIENDLY_DESIGN_TYPES[report.deceptive_design_type],
-            'is_custom_type': report.is_custom_type,
-            'num_reports': report.num_reports,
-            'last_report_timestamp': report.last_report_timestamp.timestamp() * 1000
-        } for report in reports]
     }, 200
