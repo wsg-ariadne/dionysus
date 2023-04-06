@@ -9,3 +9,6 @@
 # Config files
 **/*.conf
 docker-compose.yml
+
+# VS Code config
+.vscode/
