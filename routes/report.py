@@ -127,7 +127,7 @@ def get_reports():
     }, 200
 
 
-@bp_report.route('/by-id', methods=['GET'])
+@bp_report.route('/by-id', methods=['POST'])
 def get_report():
     # Check request body
     try:
@@ -161,7 +161,7 @@ def get_report():
     }, 200
 
 
-@bp_report.route('/by-url', methods=['GET'])
+@bp_report.route('/by-url', methods=['POST'])
 def get_report_by_url():
     # Check request body
     try:
@@ -190,11 +190,26 @@ def get_report_by_url():
     # Get reports sorted by last_report_timestamp
     specific_reports = Report.query.filter_by(domain=domain, path=path).order_by(Report.last_report_timestamp.desc())
     general_reports = Report.query.filter_by(domain=domain).order_by(Report.last_report_timestamp.desc())
+    
+    # Get specific reports for each deceptive design type, sorted by last_report_timestamp
+    specific_reports_by_type = { design_type: 0 for design_type in VALID_DESIGN_TYPES }
+    for report in specific_reports:
+        if report.is_custom_type:
+            specific_reports_by_type['other'] += 1
+        else:
+            try:
+                specific_reports_by_type[report.deceptive_design_type] = 1
+            except KeyError:
+                print('Invalid design type: ' + report.deceptive_design_type)
+                specific_reports_by_type['other'] += 1
+
+    # Return counts
     return {
         'success': True,
         'specific_reports': {
             'count': specific_reports.count(),
             'last_report_timestamp': specific_reports.first().last_report_timestamp.timestamp() * 1000 if specific_reports.first() else None,
+            'by_type': specific_reports_by_type
         },
         'general_reports': {
             'count': general_reports.count(),
