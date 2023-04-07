@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 bp_report = Blueprint('report', __name__)
 
 
-@bp_report.route('/', methods=['POST'])
+@bp_report.route('', methods=['POST'])
 def submit_report():
     # Check request body
     try:
@@ -102,7 +102,7 @@ def submit_report():
     }, 200
 
 
-@bp_report.route('/', methods=['GET'])
+@bp_report.route('', methods=['GET'])
 def get_reports():
     # Get reports
     reports = Report.query.all()
