@@ -215,12 +215,12 @@ def get_report_by_url():
     return {
         'success': True,
         'specific_reports': {
-            'count': specific_count,
+            'count': specific_count if specific_count else 0,
             'last_report_timestamp': specific_last.last_report_timestamp.timestamp() * 1000 if specific_last else None,
             'by_type': reports_by_type
         },
         'general_reports': {
-            'count': general_count,
+            'count': general_count if general_count else 0,
             'last_report_timestamp': general_last.last_report_timestamp.timestamp() * 1000 if general_last else None,
         }
     }, 200
