@@ -222,6 +222,5 @@ def get_report_by_url():
         'general_reports': {
             'count': general_count,
             'last_report_timestamp': general_last.last_report_timestamp.timestamp() * 1000 if general_last else None,
-        },
-        'total_report_count': specific_count + general_count
+        }
     }, 200
