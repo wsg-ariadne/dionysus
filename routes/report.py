@@ -3,9 +3,9 @@ from datetime import datetime
 from flask import Blueprint, request
 from models import FRIENDLY_DESIGN_TYPES, VALID_DESIGN_TYPES
 from models.report import Report
+from sqlalchemy import func
 from typing import List
 from urllib.parse import urlparse
-
 
 bp_report = Blueprint('report', __name__)
 
@@ -186,33 +186,42 @@ def get_report_by_url():
         # Extract domain and path from URL
         domain = parsed_url.netloc
         path = parsed_url.path
+
+    # Get sum of num_reports for specific and general reports
+    specific_count = db.session.query(func.sum(Report.num_reports)).filter_by(domain=domain, path=path).first()[0]
+    general_count = db.session.query(func.sum(Report.num_reports)).filter_by(domain=domain).first()[0]
     
-    # Get reports sorted by last_report_timestamp
-    specific_reports = Report.query.filter_by(domain=domain, path=path).order_by(Report.last_report_timestamp.desc())
-    general_reports = Report.query.filter_by(domain=domain).order_by(Report.last_report_timestamp.desc())
+    # Get last submitted report
+    specific_last = Report.query.filter_by(domain=domain, path=path).order_by(Report.last_report_timestamp.desc()).first()
+    general_last = Report.query.filter_by(domain=domain).order_by(Report.last_report_timestamp.desc()).first()
     
     # Get specific reports for each deceptive design type, sorted by last_report_timestamp
-    specific_reports_by_type = { design_type: 0 for design_type in VALID_DESIGN_TYPES }
-    for report in specific_reports:
-        if report.is_custom_type:
-            specific_reports_by_type['other'] += 1
+    reports_by_type = {}
+    for design_type in VALID_DESIGN_TYPES:
+        if design_type != 'other':
+            # Set reports_by_type[design_type] to sum of num_reports column
+            count = db.session.query(func.sum(Report.num_reports)).filter_by(
+                domain=domain, path=path, deceptive_design_type=design_type
+            ).first()
+            reports_by_type[design_type] = count[0] if count[0] else 0
         else:
-            try:
-                specific_reports_by_type[report.deceptive_design_type] = 1
-            except KeyError:
-                print('Invalid design type: ' + report.deceptive_design_type)
-                specific_reports_by_type['other'] += 1
+            # Set reports_by_type['other'] to sum of num_reports column
+            count = db.session.query(func.sum(Report.num_reports)).filter_by(
+                domain=domain, path=path, is_custom_type=True
+            ).first()
+            reports_by_type['other'] = count[0] if count[0] else 0
 
     # Return counts
     return {
         'success': True,
         'specific_reports': {
-            'count': specific_reports.count(),
-            'last_report_timestamp': specific_reports.first().last_report_timestamp.timestamp() * 1000 if specific_reports.first() else None,
-            'by_type': specific_reports_by_type
+            'count': specific_count,
+            'last_report_timestamp': specific_last.last_report_timestamp.timestamp() * 1000 if specific_last else None,
+            'by_type': reports_by_type
         },
         'general_reports': {
-            'count': general_reports.count(),
-            'last_report_timestamp': general_reports.first().last_report_timestamp.timestamp() * 1000 if general_reports.first() else None,
-        }
+            'count': general_count,
+            'last_report_timestamp': general_last.last_report_timestamp.timestamp() * 1000 if general_last else None,
+        },
+        'total_report_count': specific_count + general_count
     }, 200
