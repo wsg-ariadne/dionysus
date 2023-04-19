@@ -2,7 +2,6 @@ from typing import Dict, List
 import nltk
 import pandas as pd
 import pickle5 as pickle
-import random
 import string
 
 class CalliopeModel:
