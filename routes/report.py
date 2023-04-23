@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import Blueprint, request
 from models import FRIENDLY_DESIGN_TYPES, VALID_DESIGN_TYPES
 from models.report import Report
+from sqlalchemy.sql import func
 from typing import List
 from urllib.parse import urlparse
 
@@ -104,26 +105,63 @@ def submit_report():
 
 @bp_report.route('', methods=['GET'])
 def get_reports():
-    # Get reports
-    reports = Report.query.all()
+    # Check if there are any reports
+    reports = Report.query.order_by(Report.last_report_timestamp.desc()).all()
     if not reports:
         return {
             'success': False,
             'error': 'No reports found'
         }, 404
     
+    # Get sum of num_reports column
+    total_reports = Report.query.with_entities(func.sum(Report.num_reports)).scalar()
+
+    # Get unique domains
+    domains = Report.query.with_entities(Report.domain).distinct()
+
+    # Get sum of num_reports column per domain
+    grouped = Report.query.with_entities(
+        Report.domain,
+        func.sum(Report.num_reports)
+    ).group_by(Report.domain).all()
+    top_domain = max(grouped, key=lambda x: x[1])
+    top_domain_name = top_domain[0]
+    top_domain_count = top_domain[1]
+    
+    # Get sum of num_reports column per deceptive_design_type for most reported domain
+    grouped = Report.query.with_entities(
+        Report.deceptive_design_type,
+        func.sum(Report.num_reports)
+    ).filter_by(domain=top_domain_name).group_by(Report.deceptive_design_type).all()
+    count_per_type = { FRIENDLY_DESIGN_TYPES[x]: 0 for x in VALID_DESIGN_TYPES }
+    for group in grouped:
+        design_type = group[0]
+        if design_type not in VALID_DESIGN_TYPES:
+            design_type = 'other'
+        
+        count_per_type[FRIENDLY_DESIGN_TYPES[design_type]] += group[1]
+    
     # Return
     return {
         'success': True,
-        'reports': [{
-            'id': report.id,
-            'domain': report.domain,
-            'path': report.path,
-            'deceptive_design_type': FRIENDLY_DESIGN_TYPES[report.deceptive_design_type],
-            'is_custom_type': report.is_custom_type,
-            'num_reports': report.num_reports,
-            'last_report_timestamp': report.last_report_timestamp.timestamp() * 1000
-        } for report in reports]
+        'total_reports': total_reports,
+        'num_domains': domains.count(),
+        'top_domain': {
+            'domain': top_domain_name,
+            'num_reports': top_domain_count,
+            'per_type': count_per_type
+        },
+        'most_recent_reports': [
+            {
+                'id': report.id,
+                'domain': report.domain,
+                'path': report.path,
+                'deceptive_design_type': report.deceptive_design_type if report.is_custom_type else FRIENDLY_DESIGN_TYPES[report.deceptive_design_type],
+                'is_custom_type': report.is_custom_type,
+                'num_reports': report.num_reports,
+                'last_report_timestamp': report.last_report_timestamp.timestamp() * 1000
+            } for report in reports[-5:]
+        ]
     }, 200
 
 
