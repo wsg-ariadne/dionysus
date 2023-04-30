@@ -184,13 +184,16 @@ def get_report():
         }, 404
     
     # Return report
+    friendly_type = report.deceptive_design_type
+    if not report.is_custom_type:
+        friendly_type = FRIENDLY_DESIGN_TYPES[report.deceptive_design_type]
     return {
         'success': True,
         'report': {
             'id': report.id,
             'domain': report.domain,
             'path': report.path,
-            'deceptive_design_type': FRIENDLY_DESIGN_TYPES[report.deceptive_design_type],
+            'deceptive_design_type': friendly_type,
             'is_custom_type': report.is_custom_type,
             'num_reports': report.num_reports,
             'first_report_timestamp': report.created.timestamp() * 1000,
