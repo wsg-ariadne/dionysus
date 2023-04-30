@@ -193,6 +193,7 @@ def get_report():
             'deceptive_design_type': FRIENDLY_DESIGN_TYPES[report.deceptive_design_type],
             'is_custom_type': report.is_custom_type,
             'num_reports': report.num_reports,
+            'first_report_timestamp': report.created.timestamp() * 1000,
             'last_report_timestamp': report.last_report_timestamp.timestamp() * 1000
         }
     }, 200
