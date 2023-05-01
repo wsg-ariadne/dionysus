@@ -66,6 +66,16 @@ if debug:
         return str(links)
 
 
+# Error handler
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return {
+        'success': False,
+        'error': 'Internal server error: ' + str(error)
+    }, 500
+
+
 # Start Flask app
 if __name__ == '__main__':
     if enable_middleware:
