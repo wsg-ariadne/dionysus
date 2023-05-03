@@ -3,6 +3,7 @@ from flask import url_for
 from flask_cors import CORS
 from middleware.logger import LoggingMiddleware
 from routes import install_routes
+from sqlalchemy import exc
 import configparser
 
 
@@ -67,8 +68,8 @@ if debug:
 
 
 # Error handler
-@app.errorhandler(500)
-def internal_error(error):
+@app.errorhandler(exc.SQLAlchemyError)
+def sqlalchemy_error(error):
     db.session.rollback()
     return {
         'success': False,
