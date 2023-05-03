@@ -10,7 +10,7 @@ class JanusModel:
     def classify(self, img_uri: str) -> int:
         # Load image from data URI
         img_arr = np.asarray(bytearray(urlopen(img_uri).read()), dtype=np.uint8)
-        img = cv2.imdecode(img_arr, -1)
+        img = cv2.imdecode(img_arr, cv2.IMREAD_COLOR)
 
         # Resize image
         img = cv2.resize(img, (224, 224))
