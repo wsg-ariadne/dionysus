@@ -112,7 +112,7 @@ These are the valid values for `deceptive_design_types` in the request body for 
 
 The `POST /classify/image` endpoint returns a JSON object with the following keys:
 
-```json
+```jsonc
 {
     "success": true,
 
@@ -126,7 +126,7 @@ The `POST /classify/image` endpoint returns a JSON object with the following key
 
 The `POST /classify/text` endpoint returns a JSON object with the following keys:
 
-```json
+```jsonc
 {
     "success": true,
 
@@ -140,7 +140,7 @@ The `POST /classify/text` endpoint returns a JSON object with the following keys
 
 The `GET /reports` endpoint returns a JSON object with the following keys:
 
-```json
+```jsonc
 {
     // When this is false, the other keys are not present
     // and an `error` key is present instead.
@@ -200,7 +200,7 @@ The `GET /reports` endpoint returns a JSON object with the following keys:
 
 The `POST /reports/by-id` endpoint returns a JSON object with the following keys:
 
-```json
+```jsonc
 {
     "success": true,
     "report": {
@@ -232,7 +232,7 @@ The `POST /reports/by-id` endpoint returns a JSON object with the following keys
 
 The `POST /reports/by-url` endpoint returns a JSON object with the following keys:
 
-```json
+```jsonc
 {
     "success": true,
 
