@@ -25,6 +25,12 @@ services:
         condition: service_healthy
     ports:
       - '5000:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/PREFIX/healthcheck']
+      interval: 1s
+      timeout: 1s
+      retries: 3
+      start_period: 1s
     volumes:
       - /PATH/TO/dionysus.conf:/opt/app/dionysus.conf
 volumes:
