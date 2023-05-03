@@ -4,11 +4,10 @@ FROM python:3.8-slim AS dependencies
 RUN apt-get update && apt-get install -y libpq-dev build-essential
 
 # Install pip requirements under virtualenv
-RUN pip install --upgrade pip wheel
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:${PATH}"
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip wheel && pip install -r requirements.txt
 
 # Replace opencv-python with the headless version
 RUN pip uninstall opencv-python -y && pip install opencv-python-headless
