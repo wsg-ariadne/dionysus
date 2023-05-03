@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from pickles import CALLIOPE_MODEL
+from classifiers import CALLIOPE_MODEL
 
 
 # Create Flask blueprint
