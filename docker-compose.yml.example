@@ -19,19 +19,21 @@ services:
     restart: always
   backend:
     container_name: dionysus
-    image: jareddantis/dionysus:latest
+    image: jareddantis/wsg-ariadne-dionysus:latest
     depends_on:
       database:
         condition: service_healthy
     ports:
       - '5000:5000'
     healthcheck:
+      # Make sure to give Dionysus enough time to start workers and init TensorFlow
       test: ['CMD', 'curl', '-f', 'http://localhost:5000/PREFIX/healthcheck']
       interval: 1s
-      timeout: 1s
-      retries: 3
-      start_period: 1s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - /PATH/TO/dionysus.conf:/opt/app/dionysus.conf
+    restart: unless-stopped
 volumes:
   dionysus_db:

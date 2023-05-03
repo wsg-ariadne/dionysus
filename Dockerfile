@@ -9,9 +9,6 @@ ENV PATH="/opt/venv/bin:${PATH}"
 COPY requirements.txt .
 RUN pip install --upgrade pip wheel && pip install -r requirements.txt
 
-# Replace opencv-python with the headless version
-RUN pip uninstall opencv-python -y && pip install opencv-python-headless
-
 
 FROM python:3.8-slim AS runtime
 COPY --from=dependencies /opt/venv /opt/venv
@@ -26,6 +23,7 @@ WORKDIR /opt/app
 ENV PATH="/opt/venv/bin:${PATH}"
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV TF_CPP_MIN_LOG_LEVEL=2
 
 
 FROM runtime AS production
