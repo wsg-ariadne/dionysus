@@ -70,8 +70,8 @@ OK
 | Endpoint | Method | Description |
 | --- | --- | --- |
 | `/healthcheck` | `GET` | Returns `OK` if the server is running. |
-| `/classify/image` | `POST` | Classifies a cookie banner screencapture using Janus. Takes a JSON object with an `image_data` key whose value is a data URI containing a base64-encoded image. |
-| `/classify/text` | `POST` | Classifies cookie banner text using Calliope. Takes a JSON object with a `text` key. See [Classifier response object](#classifier-response-object) for the response format. |
+| `/classify/image` | `POST` | Classifies a cookie banner screencapture using Janus. Takes a JSON object with an `image_data` key whose value is a data URI containing a base64-encoded image. See [Classifier response objects](#classifier-response-objects) for the response format. |
+| `/classify/text` | `POST` | Classifies cookie banner text using Calliope. Takes a JSON object with a `text` key. See [Classifier response objects](#classifier-response-objects) for the response format. |
 | `/reports` | `GET` | See [Reports summary object](#reports-summary-object). |
 | `/reports` | `POST` | Submits a report for deceptive design patterns. Takes a JSON object with a `page_url` key and a [`deceptive_design_type`](#recognized-deceptive-design-types) key. |
 | `/reports/by-id` | `POST` | Returns a report by its UUID. Takes a JSON object with a single key `report_id` with the requested UUID. See [Report object](#report-object) for the response format. |
@@ -88,7 +88,21 @@ These are the valid values for `deceptive_design_types` in the request body for 
 | `prefilled_options` | `Pre-filled options` | The cookie banner has options that were filled out for the user, e.g., pre-checked checkboxes for different types of cookies. |
 | `other` | `Other` | Other types of deceptive design not included above. |
 
-### Classifier response object
+### Classifier response objects
+
+The `POST /classify/image` endpoint returns a JSON object with the following keys:
+
+```json
+{
+    "success": true,
+
+    // Predicted classification for the cookie banner image.
+    //   'absent'     no cookie banner options detected
+    //   'even'       cookie banner options detected, likely unweighted
+    //   'weighted'   cookie banner options detected, likely weighted
+    "classification": "absent"
+}
+```
 
 The `POST /classify/text` endpoint returns a JSON object with the following keys:
 
