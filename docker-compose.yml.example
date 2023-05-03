@@ -25,5 +25,7 @@ services:
         condition: service_healthy
     ports:
       - '5000:5000'
+    volumes:
+      - /PATH/TO/dionysus.conf:/opt/app/dionysus.conf
 volumes:
   dionysus_db:

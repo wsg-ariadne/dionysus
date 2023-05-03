@@ -1,7 +1,13 @@
 dionysus
 ===
 
-REST API for the Ariadne project. Takes care of the database and the classifiers Calliope and Janus.
+![build-docker-image workflow](https://github.com/wsg-ariadne/dionysus/actions/workflows/build-docker-image.yml/badge.svg)
+
+📚 Dionysus is the backend for the Ariadne project. It is made up of three parts:
+
+1. An instance of the [Calliope](https://github.com/wsg-ariadne/calliope) model, which classifies cookie banner text as 'good' (i.e., clear enough, likely not deceptive) or 'bad' (i.e., intent is not clear, likely deceptive).
+2. An instance of the [Janus](https://github.com/wsg-ariadne/janus) model, which classifies options or checkboxes in a cookie banner screencapture as 'absent' (no options detected), 'even' (evenly-weighted options detected), or 'weighted' (unevenly-weighted options detected).
+3. A connection to a PostgreSQL database that stores user-generated reports of deceptive design in webpages, along with a [REST API](#api) that allows for report management and model usage.
 
 ## Installation
 
@@ -57,6 +63,20 @@ When in production, set `debug=no`, `enable_logger_middleware=no`, and `cors_ori
 ```bash
 python -m gunicorn
 ```
+
+In both cases, Dionysus will be listening on port 5000.
+
+## Deployment
+
+It is recommended to use the Dionysus [Docker image](https://hub.docker.com/r/jareddantis/wsg-ariadne-dionysus), which contains all the dependencies and is ready to be deployed without manually setting up TensorFlow, NLTK, etc.
+
+This image is built on every push to the `main` branch. You can also build it locally:
+
+```bash
+docker build -t jareddantis/wsg-ariadne-dionysus .
+```
+
+Refer to the `docker-compose.yml.example` file for an example Docker Compose configuration, which includes specifications for a Postgres container. Remember to create and mount the `dionysus.conf` configuration file into `/opt/app`.
 
 ## API
 
