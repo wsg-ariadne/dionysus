@@ -57,3 +57,4 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: ${{ env.DOCKERHUB_REPOSITORY }}
         readme: "./README.md"
+      if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
