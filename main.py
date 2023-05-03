@@ -3,6 +3,7 @@ from flask import url_for
 from flask_cors import CORS
 from middleware.logger import LoggingMiddleware
 from routes import install_routes
+from sqlalchemy import exc
 import configparser
 
 
@@ -64,6 +65,16 @@ if debug:
                 links.append((url, rule.endpoint))
         # links is now a list of url, endpoint tuples
         return str(links)
+
+
+# Error handler
+@app.errorhandler(exc.SQLAlchemyError)
+def sqlalchemy_error(error):
+    db.session.rollback()
+    return {
+        'success': False,
+        'error': 'Internal server error: ' + str(error)
+    }, 500
 
 
 # Start Flask app

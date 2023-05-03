@@ -1,4 +1,4 @@
-FROM python:3.10-slim AS dependencies
+FROM python:3.8-slim AS dependencies
 
 # Install psycopg2 build dependencies
 RUN apt-get update && apt-get install -y libpq-dev build-essential
@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 
-FROM python:3.10-slim AS runtime
+FROM python:3.8-slim AS runtime
 COPY --from=dependencies /opt/venv /opt/venv
 LABEL maintainer="Jared Dantis <jareddantis@gmail.com>"
 
