@@ -11,7 +11,7 @@ class Detection(db.Model):
     domain = db.Column(db.String(255), nullable=False)
     path = db.Column(db.String(255), nullable=False)
     calliope_tripped = db.Column(db.Boolean, default=False)
-    janus_result = db.Column(db.Integer, default=False)
+    janus_result = db.Column(db.Integer, default=0)
     calliope_text = db.Column(db.String(255), nullable=True)
     janus_screenshot = db.Column(db.Text, nullable=True)
     vote = db.Column(db.Boolean, nullable=False)

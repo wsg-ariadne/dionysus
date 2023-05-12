@@ -50,19 +50,23 @@ def report_classification():
     # Get required data from request body
     try:
         page_url = request.json['page_url']
-        calliope_tripped = request.json['calliope_tripped']
-        janus_result = request.json['janus_result']
         vote = request.json['vote']
+        calliope_tripped = request.json.get('calliope_tripped', None)
+        janus_result = request.json.get('janus_result', None)
         calliope_text = request.json.get('calliope_text', None)
         janus_screenshot = request.json.get('janus_screenshot', None)
         remarks = request.json.get('remarks', None)
 
         # janus_result must be in JANUS_CLASSIFICATIONS
-        if janus_result not in JANUS_CLASSIFICATIONS.values():
+        if janus_result is not None and janus_result not in JANUS_CLASSIFICATIONS.values():
+            raise ValueError
+        
+        # calliope_tripped must be Boolean
+        if calliope_tripped is not None and not isinstance(calliope_tripped, bool):
             raise ValueError
 
-        # calliope_tripped and vote must be Booleans
-        if not isinstance(calliope_tripped, bool) or not isinstance(vote, bool):
+        # vote must be Boolean
+        if not isinstance(vote, bool):
             raise ValueError
     except KeyError:
         return {
@@ -93,7 +97,9 @@ def report_classification():
     print(remarks)
     
     # Get key in JANUS_CLASSIFICATIONS for janus_result
-    janus_result_int = list(JANUS_CLASSIFICATIONS.keys())[list(JANUS_CLASSIFICATIONS.values()).index(janus_result)]
+    janus_result_int = None
+    if janus_result is not None:
+        janus_result_int = list(JANUS_CLASSIFICATIONS.keys())[list(JANUS_CLASSIFICATIONS.values()).index(janus_result)]
     
     # Save report to database
     detection = Detection(

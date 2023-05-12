@@ -164,15 +164,17 @@ The `POST /classify/report` endpoint expects a JSON object with the following ke
     // URL of the page where the cookie banner was found
     "page_url": "http://example.com",
 
+    // Whether the user verified the classification as correct or not
+    "vote": true,
+
+    // Optional:
     // Whether the cookie banner used unclear language or not
     "calliope_tripped": true,
 
+    // Optional:
     // Janus's classification for the cookie banner
     // See (#classifier-response-objects) for the possible values
     "janus_result": "weighted",
-
-    // Whether the user verified the classification as correct or not
-    "vote": true,
 
     // Optional:
     // The cookie banner text that was submitted to /classify/text
