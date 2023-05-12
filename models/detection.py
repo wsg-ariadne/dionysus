@@ -15,3 +15,4 @@ class Detection(db.Model):
     calliope_text = db.Column(db.String(255), nullable=True)
     janus_screenshot = db.Column(db.Text, nullable=True)
     vote = db.Column(db.Boolean, nullable=False)
+    remarks = db.Column(db.Text, nullable=True)

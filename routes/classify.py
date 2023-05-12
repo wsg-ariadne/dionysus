@@ -53,6 +53,9 @@ def report_classification():
         calliope_tripped = request.json['calliope_tripped']
         janus_result = request.json['janus_result']
         vote = request.json['vote']
+        calliope_text = request.json.get('calliope_text', None)
+        janus_screenshot = request.json.get('janus_screenshot', None)
+        remarks = request.json.get('remarks', None)
 
         # janus_result must be in JANUS_CLASSIFICATIONS
         if janus_result not in JANUS_CLASSIFICATIONS.values():
@@ -87,13 +90,7 @@ def report_classification():
         domain = parsed_url.netloc
         path = parsed_url.path
     
-    # Get optional data from request body
-    try:
-        calliope_text = request.json['calliope_text']
-        janus_screenshot = request.json['janus_screenshot']
-    except KeyError:
-        calliope_text = None
-        janus_screenshot = None
+    print(remarks)
     
     # Get key in JANUS_CLASSIFICATIONS for janus_result
     janus_result_int = list(JANUS_CLASSIFICATIONS.keys())[list(JANUS_CLASSIFICATIONS.values()).index(janus_result)]
@@ -106,7 +103,8 @@ def report_classification():
         janus_result=janus_result_int,
         calliope_text=calliope_text,
         janus_screenshot=janus_screenshot,
-        vote=vote
+        vote=vote,
+        remarks=remarks
     )
     db.session.add(detection)
     db.session.commit()

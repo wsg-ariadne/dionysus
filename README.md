@@ -181,7 +181,10 @@ The `POST /classify/report` endpoint expects a JSON object with the following ke
     // Optional:
     // The cookie banner image that was submitted to /classify/image,
     // in data URI format
-    "janus_screenshot": "data:image/png;base64,..."
+    "janus_screenshot": "data:image/png;base64,...",
+
+    // Optional: User remarks
+    "remarks": "This cookie banner is deceptive because..."
 }
 ```
 
