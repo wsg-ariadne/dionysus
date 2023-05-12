@@ -110,6 +110,7 @@ OK
 | `/healthcheck` | `GET` | Returns `OK` if the server is running. |
 | `/classify/image` | `POST` | Classifies a cookie banner screencapture using Janus. Takes a JSON object with an `image_data` key whose value is a data URI containing a base64-encoded image. See [Classifier response objects](#classifier-response-objects) for the response format. |
 | `/classify/text` | `POST` | Classifies cookie banner text using Calliope. Takes a JSON object with a `text` key. See [Classifier response objects](#classifier-response-objects) for the response format. |
+| `/classify/report` | `POST` | Submits a report for *automatic* deceptive design detection. See [Classifier report and response object](#classifier-report-and-response-object) for the request and response formats. |
 | `/reports` | `GET` | See [Reports summary object](#reports-summary-object). |
 | `/reports` | `POST` | Submits a report for deceptive design patterns. Takes a JSON object with a `page_url` key and a [`deceptive_design_type`](#recognized-deceptive-design-types) key. |
 | `/reports/by-id` | `POST` | Returns a report by its UUID. Takes a JSON object with a single key `report_id` with the requested UUID. See [Report object](#report-object) for the response format. |
@@ -151,6 +152,46 @@ The `POST /classify/text` endpoint returns a JSON object with the following keys
     // Whether the language used in the cookie banner text
     // is 'good' (likely not deceptive) or 'bad' (likely deceptive)
     "is_good": true
+}
+```
+
+### Classifier report and response object
+
+The `POST /classify/report` endpoint expects a JSON object with the following keys:
+
+```jsonc
+{
+    // URL of the page where the cookie banner was found
+    "page_url": "http://example.com",
+
+    // Whether the cookie banner used unclear language or not
+    "calliope_tripped": true,
+
+    // Janus's classification for the cookie banner
+    // See (#classifier-response-objects) for the possible values
+    "janus_result": "weighted",
+
+    // Whether the user verified the classification as correct or not
+    "vote": true,
+
+    // Optional:
+    // The cookie banner text that was submitted to /classify/text
+    "calliope_text": "We use cookies on this site...",
+
+    // Optional:
+    // The cookie banner image that was submitted to /classify/image,
+    // in data URI format
+    "janus_screenshot": "data:image/png;base64,..."
+}
+```
+
+The endpoint will then return a JSON object with the following keys:
+
+```jsonc
+{
+    // UUID of the detection report
+    "detection_id": "9d852b6b-c20c-49e6-909d-c8529fae3773",
+    "success": true
 }
 ```
 
