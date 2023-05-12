@@ -30,6 +30,24 @@ Install the rest of the dependencies:
 pip install -r requirements.txt
 ```
 
+### Apple silicon
+
+[Janus](https://github.com/wsg-ariadne/janus) uses TensorFlow, which at the time of writing is provided by the `tensorflow-macos` pip package on macOS running on Apple silicon.
+
+This guide assumes you already have the Xcode command-line tools (`sudo xcode-select --install`). To install TensorFlow for Apple silicon with support for GPU via the Metal API,
+
+1. Install [Miniforge](https://github.com/conda-forge/miniforge) either via the official installer or via Pyenv (`pyenv install miniforge3-latest`).
+2. Create a new conda environment with `conda create -n tf-macos python=3.8`.
+3. Activate the environment with `conda activate tf-macos`.
+4. Install TensorFlow's dependencies with `conda install -c apple tensorflow-deps`.
+5. Install TensorFlow with `pip install tensorflow-macos tensorflow-metal`.
+
+Then install the rest of the dependencies with
+
+```bash
+pip install SQLAlchemy Flask Flask-SQLAlchemy flask-cors gunicorn nltk pandas pickle5 numpy opencv-python-headless psycopg2-binary
+```
+
 ## Usage
 
 Make sure you have a Postgres database set up. Take note of the username, password, hostname (if not `localhost`), and port.
@@ -92,6 +110,7 @@ OK
 | `/healthcheck` | `GET` | Returns `OK` if the server is running. |
 | `/classify/image` | `POST` | Classifies a cookie banner screencapture using Janus. Takes a JSON object with an `image_data` key whose value is a data URI containing a base64-encoded image. See [Classifier response objects](#classifier-response-objects) for the response format. |
 | `/classify/text` | `POST` | Classifies cookie banner text using Calliope. Takes a JSON object with a `text` key. See [Classifier response objects](#classifier-response-objects) for the response format. |
+| `/classify/report` | `POST` | Submits a report for *automatic* deceptive design detection. See [Classifier report and response object](#classifier-report-and-response-object) for the request and response formats. |
 | `/reports` | `GET` | See [Reports summary object](#reports-summary-object). |
 | `/reports` | `POST` | Submits a report for deceptive design patterns. Takes a JSON object with a `page_url` key and a [`deceptive_design_type`](#recognized-deceptive-design-types) key. |
 | `/reports/by-id` | `POST` | Returns a report by its UUID. Takes a JSON object with a single key `report_id` with the requested UUID. See [Report object](#report-object) for the response format. |
@@ -133,6 +152,49 @@ The `POST /classify/text` endpoint returns a JSON object with the following keys
     // Whether the language used in the cookie banner text
     // is 'good' (likely not deceptive) or 'bad' (likely deceptive)
     "is_good": true
+}
+```
+
+### Classifier report and response object
+
+The `POST /classify/report` endpoint expects a JSON object with the following keys:
+
+```jsonc
+{
+    // URL of the page where the cookie banner was found
+    "page_url": "http://example.com",
+
+    // Whether the cookie banner used unclear language or not
+    "calliope_tripped": true,
+
+    // Janus's classification for the cookie banner
+    // See (#classifier-response-objects) for the possible values
+    "janus_result": "weighted",
+
+    // Whether the user verified the classification as correct or not
+    "vote": true,
+
+    // Optional:
+    // The cookie banner text that was submitted to /classify/text
+    "calliope_text": "We use cookies on this site...",
+
+    // Optional:
+    // The cookie banner image that was submitted to /classify/image,
+    // in data URI format
+    "janus_screenshot": "data:image/png;base64,...",
+
+    // Optional: User remarks
+    "remarks": "This cookie banner is deceptive because..."
+}
+```
+
+The endpoint will then return a JSON object with the following keys:
+
+```jsonc
+{
+    // UUID of the detection report
+    "detection_id": "9d852b6b-c20c-49e6-909d-c8529fae3773",
+    "success": true
 }
 ```
 
