@@ -30,6 +30,24 @@ Install the rest of the dependencies:
 pip install -r requirements.txt
 ```
 
+### Apple silicon
+
+[Janus](https://github.com/wsg-ariadne/janus) uses TensorFlow, which at the time of writing is provided by the `tensorflow-macos` pip package on macOS running on Apple silicon.
+
+This guide assumes you already have the Xcode command-line tools (`sudo xcode-select --install`). To install TensorFlow for Apple silicon with support for GPU via the Metal API,
+
+1. Install [Miniforge](https://github.com/conda-forge/miniforge) either via the official installer or via Pyenv (`pyenv install miniforge3-latest`).
+2. Create a new conda environment with `conda create -n tf-macos python=3.8`.
+3. Activate the environment with `conda activate tf-macos`.
+4. Install TensorFlow's dependencies with `conda install -c apple tensorflow-deps`.
+5. Install TensorFlow with `pip install tensorflow-macos tensorflow-metal`.
+
+Then install the rest of the dependencies with
+
+```bash
+pip install SQLAlchemy Flask Flask-SQLAlchemy flask-cors gunicorn nltk pandas pickle5 numpy opencv-python-headless psycopg2-binary
+```
+
 ## Usage
 
 Make sure you have a Postgres database set up. Take note of the username, password, hostname (if not `localhost`), and port.
